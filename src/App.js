@@ -88,7 +88,6 @@ function App() {
 
   const handleSubmit = () => {
     const total = eval(calculatorData);
-    console.log(calculatorData);
 
     setInput(`${total}`);
     setOutput(`${total}`);
@@ -103,7 +102,6 @@ function App() {
 
   // handle number functions
   const handleNumbers = (value) => {
-    console.log(calculatorData);
     // the input will set default 0 (display on calculator)
     // check if there is any number being added to initial calculator, then update input & calculatorData
     // so it will remove 0 and set the new value without 0 in front
