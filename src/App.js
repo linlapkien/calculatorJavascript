@@ -28,7 +28,7 @@ const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const Display = ({ input, output }) => {
   return (
     <div className="output">
-      <span className="result"></span>
+      <span className="result">{output}</span>
       <span id="display" className="input">
         {input}
       </span>
@@ -87,21 +87,31 @@ function App() {
   };
 
   const handleSubmit = () => {
-    console.log('handleSubmit');
+    const total = eval(calculatorData);
+    console.log(calculatorData);
+
+    setInput(`${total}`);
+    setOutput(`${total}`);
+    setCalculatorData(`${total}`);
   };
 
   const handleClear = () => {
-    console.log('handleClear');
+    setInput('0');
+    setOutput('');
+    setCalculatorData('');
   };
 
   // handle number functions
   const handleNumbers = (value) => {
+    console.log(calculatorData);
     // the input will set default 0 (display on calculator)
     // check if there is any number being added to initial calculator, then update input & calculatorData
     // so it will remove 0 and set the new value without 0 in front
-    if (!calculatorData.length) {
-      setInput(`${value}`);
-      setCalculatorData(`${value}`);
+    if (calculatorData.length === 0) {
+      if (value !== '0') {
+        setInput(`${value}`);
+        setCalculatorData(`${value}`);
+      }
     } else {
       // else the data is already inside calData
       // If value = 0, and the calcData/input has alreay 0,
@@ -157,7 +167,67 @@ function App() {
   };
 
   const handleOperators = (value) => {
-    console.log({ value });
+    // if the calculatorData have value (lenght > 0)
+    // then this function will go in the if condition
+    // forExample, initial in display, input default = 0,
+    // but the output dont have data, so the operator can not execute
+    if (calculatorData.length) {
+      // update the input, when the operator button is triggered
+      setInput(`${value}`);
+
+      setOutput(calculatorData);
+
+      const beforeLastChar = calculatorData.charAt(calculatorData.length - 2);
+
+      const beforeLastCharIsOperator =
+        operators.includes(beforeLastChar) || beforeLastChar === '*';
+
+      const lastChar = calculatorData.charAt(calculatorData.length - 1);
+
+      const isLastCharOperator =
+        operators.includes(lastChar) || lastChar === '*';
+
+      const validOp = value === 'x' ? '*' : value;
+
+      // console.log(beforeLastChar);
+      // console.log(beforeLastCharIsOperator);
+      // console.log(lastChar);
+      // console.log(isLastCharOperator);
+      // console.log(validOp);
+
+      // in this case, the valid function is there will be 2 operator, but the last one is always be "-"
+      // example: *-, +-, /-, --
+      // and if another operator button is trigger (not the "-" one) it will replace 2 operator to that operator value
+      // in this if condition, if there are 2 operators but the last is "-"
+      // 5 * -5 =, result should be -25, (i.e 5 * (-5)) is Valid
+      // another case 5 + * 7 = 35, (i.e. 5 * 7)
+      if (
+        (isLastCharOperator && value !== '-') ||
+        (beforeLastCharIsOperator && isLastCharOperator)
+      ) {
+        // in this case, there are 2 operators are triggered but no "-" op in the lastChar
+        // i.e. ++, *+, /+, -+, -*, -/
+        if (beforeLastCharIsOperator) {
+          // in this case, there are 2 operators are triggered but "-" op in the lastChar
+          // i.e. +- and click another operator
+          // +- * => *, -- - => -, /- + => +
+          const updatedValue = `${calculatorData.substring(
+            0,
+            calculatorData.length - 2
+          )}${value}`;
+          setCalculatorData(updatedValue);
+        } else {
+          setCalculatorData(
+            `${calculatorData.substring(
+              0,
+              calculatorData.length - 1
+            )}${validOp}`
+          );
+        }
+      } else {
+        setCalculatorData(`${calculatorData}${validOp}`);
+      }
+    }
   };
 
   // update the output
